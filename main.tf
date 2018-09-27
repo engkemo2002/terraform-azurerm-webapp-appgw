@@ -47,8 +47,15 @@ resource "azurerm_app_service" "webapp" {
 
   site_config {
     always_on = true
- 
+
     ftps_state = "FtpsOnly"
+
+   # Doesnt work, no ip is assigned to the pip before the app gw has been created
+   # No app gw is created before the web app has been created
+   # ip_restriction {
+   #   ip_address  = "${azurerm_public_ip.pip.ip_address}"
+   #   subnet_mask = "255.255.255.255"
+   # }
   }
 
   identity {
@@ -218,9 +225,10 @@ resource "azurerm_application_gateway" "appgw" {
     interval            = "${var.agw_probe_interval}"
     timeout             = "${var.agw_probe_timeout}"
     unhealthy_threshold = "${var.agw_probe_unhealthy_threshold}"
+
     match {
       status_code = ["${var.agw_probe_match_statuscode}"]
-      body = ""
+      body        = ""
     }
   }
 
